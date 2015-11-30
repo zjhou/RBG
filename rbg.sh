@@ -11,6 +11,9 @@ global_var() {
     post_per_pg=4
     blog_title="ZjHOU"
     blog_subtitle=""
+    #optional theme: "line"
+    blog_theme="default"
+
 }
 
 global_var
@@ -72,6 +75,19 @@ myceil() {
 }
 
 
+#$1 theme name
+theme() { 
+    case "$1" in 
+        "line" )
+            sed '/^<[p|m]/ ! s/\(^[0-9]*\-[0-9]*\-[0-9]*\)/                        \1 +---------/; t;
+                 /^<[p|m]/ ! s/^/                                   | /';;
+        "default" )
+            sed '/^<[p|m]/ ! s/^/    /';;
+    esac
+
+
+}
+
 #$1 post name
 get_time() {
     echo `ls -l --time-style=+"%Y-%m-%d" $site_url/$1 | \
@@ -80,14 +96,11 @@ get_time() {
 
 #$* posts name
 gen_content() {
-
-    echo "<pre>"
     for post in $*; do
         echo -e "\n\n"
         local time=`get_time $post`
         sed "1a $time\n" $post
     done
-    echo "</pre>"
 }
 
 #$1 pagenum 
@@ -101,9 +114,8 @@ cat << EOF
 
 
 
-----------------
 <a href='$home_url'>$blog_title</a>
-----------------
+
 
 
 $blog_subtitle
@@ -128,11 +140,14 @@ EOF
 #footer 
 cat << EOF
 
-________________
+
 $pre_lnk ($(($1+1))/$2) $nex_lnk
 </pre>
 EOF
 }
+
+
+
 generate() {
     local posts_name=(`ls -t --format=single-column $site_url/*.raw | \
                         awk -F '/' '{print $NF}'`)
@@ -144,10 +159,12 @@ generate() {
     for ((i=0; i<$total_pages; i++)); do
         if [ $i -eq 0 ]; then        
             gen_content ${posts_name[@]:0:$post_per_pg} | \
-            gen_page $i $total_pages > $site_url/index.html
+            gen_page $i $total_pages | \
+            theme $blog_theme > $site_url/index.html
         else
             gen_content ${posts_name[@]:$(($i*$post_per_pg)):$post_per_pg} | \
-            gen_page $i $total_pages > $site_url/page$i.html 
+            gen_page $i $total_pages | \
+            theme $blog_theme > $site_url/page$i.html 
         fi
     done
 
@@ -167,8 +184,8 @@ list() {
     ls -t --format=single-column $site_url/*.raw | \
     awk -F '/' '{print $NF}' | sed 's/.raw//g'
 }
+
 #publish $*
-#gen_page $*
-#generate
-#refresh
-list
+refresh
+#list
+#del
