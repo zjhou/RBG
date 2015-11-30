@@ -3,13 +3,13 @@
 #describe: raw blog generator
 #date: 2015-11-29
 #inspiration: bashblog
-#copyright: GNU
+#copyright: null
 
 global_var() {
     site_url=$HOME/site/rbg
     home_url="/rbg"
     post_per_pg=4
-    blog_title="ZjHOU"
+    blog_title="Z+"
     blog_subtitle=""
     #optional theme: "line"
     blog_theme="line"
@@ -176,7 +176,7 @@ refresh() {
     fi
 
     generate
-    cd -
+    cd - &> /dev/null
 }
 
 list() {
