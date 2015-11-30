@@ -12,11 +12,10 @@ global_var() {
     blog_title="ZjHOU"
     blog_subtitle=""
     #optional theme: "line"
-    blog_theme="default"
+    blog_theme="line"
 
 }
 
-global_var
 
 publish() {
     {
@@ -185,7 +184,46 @@ list() {
     awk -F '/' '{print $NF}' | sed 's/.raw//g'
 }
 
-#publish $*
-refresh
-#list
-#del
+doc() {
+cat << EOF
+    
+    USAGE: $0 [-d <post_title> | -p <file_name> | -l | -r | -h ]
+
+        1. -d 删除博文，参数是博文标题
+        2. -p 发布博文，参数是文件的标题，留空，则从标准输入读取。
+              博文格式：第一行为标题；其余行为正文。
+        3. -l 列出博文目录。
+        4. -r 重新渲染网页文件。
+        5. -h 显示本帮助内容。
+
+    EXAMPLE: 
+
+        ./rbg.sh -p example.txt
+        ./rbg.sh -d test
+        ./rgb.sh -l
+
+EOF
+}
+
+main() {
+    global_var
+
+    if [ $# -eq 0 ]; then
+        doc
+    fi
+
+    while getopts "p:lrd:h" Option
+    do
+        case $Option in 
+            p) publish $OPTARG;;
+            l) list;;
+            r) refresh;;
+            d) del $OPTARG;;
+            h) doc;;
+            *) doc;;
+        esac
+    done
+}
+#*************
+main $* #*****
+#*************
