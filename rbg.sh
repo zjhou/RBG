@@ -64,6 +64,19 @@ del() {
     return 0
 }
 
+#$1 博文标题
+#编辑博文
+edit() {
+    if [ -f $site_url/$1.raw ]; then
+        eval `which vim` $site_url/$1.raw
+    else 
+        echo "
+        can't find post: $1,
+        you can use './rbg.sh -l' to list all posts
+        "
+    fi
+}
+
 #Math.ceil($1/$2)
 myceil() {
     if [ $(($1%$2)) -eq 0 ]; then
@@ -192,16 +205,27 @@ list() {
 doc() {
 cat << EOF
     
-    USAGE: $0 [-d <post_title> | -p <file_name> | -l | -r | -h ]
+    NAME:
+        rbg - raw blog generator.
 
-        1. -d 删除博文，参数是博文标题
-        2. -p 发布博文，参数是文件的标题，留空，则从标准输入读取。
-              博文格式：第一行为标题；其余行为正文。
-        3. -l 列出博文目录。
-        4. -r 重新渲染网页文件。
-        5. -h 显示本帮助内容。
+    USAGE: $0 [OPTION]
 
-    EXAMPLE: 
+    VALID OPTIONS:
+
+        -p file 将file的内容作为博文发布，file为空，则从标准输入读取。
+                博文格式：第一行为标题；其余行为正文。
+
+        -d title 删除博文，参数是博文标题
+
+        -e title 修改已经发布的博文
+
+        -l 列出所有博文目录。
+
+        -r 重新渲染网页文件。
+
+        -h 显示本帮助内容。
+
+    EXAMPLES: 
 
         ./rbg.sh -p example.txt
         ./rbg.sh -d test
@@ -217,13 +241,14 @@ main() {
         doc
     fi
 
-    while getopts "p:lrd:h" Option
+    while getopts "p:d:e:lrh" Option
     do
         case $Option in 
             p) publish $OPTARG;;
             l) list;;
             r) refresh;;
             d) del $OPTARG;;
+            e) edit $OPTARG;;
             h) doc;;
             *) doc;;
         esac
