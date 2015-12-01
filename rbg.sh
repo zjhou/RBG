@@ -12,8 +12,8 @@ global_var() {
     home_url="/rbg"
     post_per_pg=4
     blog_title="Z+"
-    blog_subtitle=""
-    #optional theme: "line"
+    blog_subtitle="毕竟空谈"
+    #参考theme函数中的关键字。
     blog_theme="line"
 }
 
@@ -82,7 +82,10 @@ theme() {
             sed '/^<[p|m]/ ! s/\(^[0-9]*\-[0-9]*\-[0-9]*\)/                        \1 +---------/; t;
                  /^<[p|m]/ ! s/^/                                   | /';;
         "default" )
-            sed '/^<[p|m]/ ! s/^/    /';;
+            sed '/^<[p|m]/ ! s/^/                                   /';;
+        "dot" )
+            sed '/^<[p|m]/ ! s/^/ . . .                             /';;
+        "null" ) cat ;;
     esac
 
 
@@ -97,7 +100,7 @@ get_time() {
 #$* posts name
 gen_content() {
     for post in $*; do
-        echo -e "\n\n"
+        echo -e "\n\n\n\n\n"
         local time=`get_time $post`
         sed "1a $time\n" $post
     done
@@ -116,9 +119,10 @@ cat << EOF
 
 <a href='$home_url'>$blog_title</a>
 
-
-
 $blog_subtitle
+
+
+
 EOF
 
     cat
