@@ -8,17 +8,16 @@
 #copyright: null
 
 global_var() {
-    site_url=$HOME/site/rbg
+    site_url=/home/zjh/site/rbg
     home_url="/rbg"
-    post_per_pg=4
-    blog_title="Z+"
-    blog_subtitle="毕竟空谈"
-    #参考theme函数中的关键字。
-    blog_theme="line"
+    post_per_pg=7
+    blog_title="HELLO"
+    blog_subtitle="Define is not defined."
+    blog_theme="default"
 }
 
 
-publish() {
+add() {
     {
         if [ $# -eq 0 ]; then
             cat
@@ -106,8 +105,8 @@ theme() {
 
 #$1 post name
 get_time() {
-    echo `ls -l --time-style=+"%Y-%m-%d" $site_url/$1 | \
-          grep -oE '[0-9]+\-[0-9]+\-[0-9]+'`
+    echo `ls -l --time-style=+"%Y %m %d" $site_url/$1 | \
+          grep -oE '[0-9]{4} [0-9]{2} [0-9]{2}'`
 }
 
 #$* posts name
@@ -115,7 +114,11 @@ gen_content() {
     for post in $*; do
         echo -e "\n\n\n\n\n"
         local time=`get_time $post`
-        sed "1a $time\n" $post
+        #temp solution 
+        sed -e "1i -\n$time" \
+            -e "1a -\n" \
+            -e "s/</\&lt;/g" \
+            -e "s/>/\&gt;/g" $post
     done
 }
 
@@ -244,7 +247,7 @@ main() {
     while getopts "p:d:e:lrh" Option
     do
         case $Option in 
-            p) publish $OPTARG;;
+            p) add $OPTARG;;
             l) list;;
             r) refresh;;
             d) del $OPTARG;;
