@@ -1,7 +1,6 @@
 #!/bin/bash
 #script: rbg.sh
 #author: zjhou
-#email: atzjhou@gmail.com
 #describe: raw blog generator
 #date: 2015-11-29
 #inspiration: bashblog
