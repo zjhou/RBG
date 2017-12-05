@@ -1,5 +1,5 @@
 # RBG
-RBG(Raw BloG) - 生成没有样式的静态博客。
+RBG(Raw Blog Generator) - 静态博客生成器。
 
 
 ### CONFIG
@@ -40,4 +40,4 @@ EOF
 ```
 
 ### DEMO
-[http://raw.zjhou.com](http://raw.zjhou.com)
+[https://zjhou.github.io](https://zjhou.github.io)
