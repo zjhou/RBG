@@ -8,7 +8,7 @@
 
 global_var() {
     site_url=/mnt/d/zjhProjects/zjhou.github.io
-    home_url=""
+    home_url="http://blog.zjhou.me"
     author="zjhou"
     post_per_pg=5
     blog_title="A BLOG"
@@ -114,10 +114,11 @@ get_time() {
 gen_content() {
     for post in $*; do
         echo -e "\n\n\n\n\n"
-#        local time=`get_time $post`
-#        sed -e "1i -\n$time" \
-        sed -e "1i -" \
-            -e "1a -\n" \
+
+#            -e "1a \ * `get_time $post`\n\ */\n" \
+        sed -e "1i /**" \
+	    -e "1s/^/ * /" \
+            -e "1a \ */\n" \
             -e "s/</\&lt;/g" \
             -e "s/>/\&gt;/g" $post
     done
@@ -144,6 +145,8 @@ a {
 pre {
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
   font-size: 12px;
+  color: #24292e;
+  line-height: 1.7;
 }
 </style>
 </head>
