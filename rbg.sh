@@ -7,16 +7,21 @@
 #copyright: null
 
 global_var() {
-    site_url=/mnt/d/zjhProjects/zjhou.github.io
+    site_url=/d/zjhProjects/zjhou.github.io
     home_url="http://blog.zjhou.me"
     author="zjhou"
     post_per_pg=5
     blog_title="A BLOG"
-    blog_subtitle="notes or thoughts"
+    blog_subtitle="用文字，把思维拍成照片。"
     blog_theme="default"
     github_url="https://github.com/zjhou/RBG"
 }
 
+init ()
+{
+    [ -d "$site_url/raw" ] || mkdir "$site_url/raw"
+    [ -d "$site_url/html" ] || mkdir "$site_url/html"
+}
 
 add() {
     {
@@ -28,7 +33,7 @@ add() {
     } > $site_url/___.raw
 
     local title=`head -n1 $site_url/___.raw`
-    mv $site_url/___.raw $site_url/$title.raw
+    mv $site_url/___.raw $site_url/raw/$title.raw
 
     refresh
 }
@@ -47,8 +52,8 @@ is_dir_empty?() {
 
 del() {
     for post in $*; do
-        if [ -f $site_url/$post.raw ]; then
-            rm $site_url/$post.raw
+        if [ -f $site_url/raw/$post.raw ]; then
+            rm $site_url/raw/$post.raw
         else
             echo "can't find post: $post"
             return 1
@@ -57,7 +62,7 @@ del() {
 
     refresh
 
-    if is_dir_empty? $site_url; then
+    if is_dir_empty? $site_url/raw; then
         echo null > $site_url/index.html
     fi
 
@@ -67,8 +72,8 @@ del() {
 #$1 博文标题
 #编辑博文
 edit() {
-    if [ -f $site_url/$1.raw ]; then
-        eval `which vim` $site_url/$1.raw
+    if [ -f $site_url/raw/$1.raw ]; then
+        eval `which vim` $site_url/raw/$1.raw
     else 
         echo "
         can't find post: $1,
@@ -106,7 +111,7 @@ theme() {
 
 #$1 post name
 get_time() {
-    echo `ls -l --time-style=+"%Y %m %d" $site_url/$1 | \
+    echo `ls -l --time-style=+"%Y %m %d" $site_url/raw/$1 | \
           grep -oE '[0-9]{4} [0-9]{2} [0-9]{2}'`
 }
 
@@ -118,9 +123,8 @@ gen_content() {
 #            -e "1a \ * `get_time $post`\n\ */\n" \
         sed -e "1i /**" \
 	    -e "1s/^/ * /" \
-            -e "1a \ */\n" \
-            -e "s/</\&lt;/g" \
-            -e "s/>/\&gt;/g" $post
+            -e "s/<style/\&lt;style/g" \
+            -e "1a \ */\n" raw/$post
     done
 }
 
@@ -135,7 +139,7 @@ cat << EOF
 <head>
 <meta charset="utf-8">
 <meta name="google-site-verification" content="TMqb3Vak-W42Abbl4dRvl_D_axmyJIrb9uuZ_krREAM" />
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<base href="$home_url" />
 <title>$blog_title</title>
 <style>
 a {
@@ -172,7 +176,7 @@ EOF
     cat
 
     if [ $(($1+1)) -lt $2 ]; then
-        local nex_lnk="<a href='$home_url/page$(($1+1)).html'>NEXT</a>"
+        local nex_lnk="<a href='html/page$(($1+1)).html'>NEXT</a>"
     elif [ $(($1+1)) -eq $2 ]; then
         local nex_lnk=""
     fi
@@ -180,9 +184,9 @@ EOF
     if [ $1 -eq 0 ]; then
         local pre_lnk=""
     elif [ $1 -eq 1 ]; then
-        local pre_lnk="<a href=$home_url/>PREV</a>"
+        local pre_lnk="<a href=/>PREV</a>"
     else
-        local pre_lnk="<a href='$home_url/page$(($1-1)).html'>PREV</a>"
+        local pre_lnk="<a href='html/page$(($1-1)).html'>PREV</a>"
     fi
 
 #footer 
@@ -199,7 +203,7 @@ EOF
 
 
 generate() {
-    local posts_name=(`ls -t --format=single-column $site_url/*.raw | \
+    local posts_name=(`ls -t --format=single-column $site_url/raw/*.raw | \
                         awk -F '/' '{print $NF}'`)
 
 
@@ -214,7 +218,7 @@ generate() {
         else
             gen_content ${posts_name[@]:$(($i*$post_per_pg)):$post_per_pg} | \
             gen_page $i $total_pages | \
-            theme $blog_theme > $site_url/page$i.html 
+            theme $blog_theme > $site_url/html/page$i.html 
         fi
     done
 
@@ -231,7 +235,7 @@ refresh() {
 }
 
 list() {
-    ls -t --format=single-column $site_url/*.raw | \
+    ls -t --format=single-column $site_url/raw/*.raw | \
     awk -F '/' '{print $NF}' | sed 's/.raw//g'
 }
 
@@ -269,6 +273,8 @@ EOF
 
 main() {
     global_var
+    
+    init
 
     if [ $# -eq 0 ]; then
         doc
