@@ -9,10 +9,12 @@
 global_var() {
     site_url=/d/zjhProjects/zjhou.github.io
     home_url="http://blog.zjhou.me"
+    # tags must split with '\|'
+    escapedTag="style\|script"
     author="zjhou"
     post_per_pg=5
     blog_title="A BLOG"
-    blog_subtitle="用文字，把思维拍成照片。"
+    blog_subtitle="用文字把思维拍成照片。"
     blog_theme="default"
     github_url="https://github.com/zjhou/RBG"
 }
@@ -123,7 +125,7 @@ gen_content() {
 #            -e "1a \ * `get_time $post`\n\ */\n" \
         sed -e "1i /**" \
 	    -e "1s/^/ * /" \
-            -e "s/<style/\&lt;style/g" \
+            -e "s/<\($escapedTag\)/\&lt;\1/g" \
             -e "1a \ */\n" raw/$post
     done
 }
